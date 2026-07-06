@@ -1,0 +1,6 @@
+export const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://cypox.vercel.app'
+export const EMAIL = import.meta.env.VITE_EMAIL || 'Coffigildas268@gmail.com'
+export const PHONE = '+229 60 04 03 58'
+export const PHONE_RAW = '22960040358'
+export const WHATSAPP_URL = 'https://wa.me/22960040358'
+export const TIKTOK_URL = 'https://tiktok.com/@paul_coffi'

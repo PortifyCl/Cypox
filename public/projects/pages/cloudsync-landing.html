@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://formspree.io; frame-src 'self'; upgrade-insecure-requests" />
+  <title>CloudSync — Synchronisation de fichiers pour entreprises</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: '#2563EB',
+            dark: '#0F172A',
+            bg: '#FAFBFF',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after { font-family: 'Inter', sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background: #FAFBFF; }
+
+    .glass {
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .hero-gradient {
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(37,99,235,0.12) 0%, rgba(250,251,255,0) 70%);
+    }
+
+    .float-anim {
+      animation: floatUp 3s ease-in-out infinite alternate;
+    }
+    .float-anim-delay {
+      animation: floatUp 3s ease-in-out 1.2s infinite alternate;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .spin-slow {
+      animation: spin 1.6s linear infinite;
+    }
+
+    .bento-card {
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .feature-card {
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 8px 24px rgba(37,99,235,0.1);
+      transform: translateY(-4px);
+    }
+
+    .step-card {
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .testimonial-card {
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .pricing-card {
+      background: white;
+      border: 2px solid #2563EB;
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 32px rgba(37,99,235,0.12);
+    }
+
+    .compare-table th, .compare-table td {
+      padding: 0.875rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    .compare-table th {
+      background: #F1F5F9;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #334155;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #E5E7EB;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #2563EB;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #2563EB;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+    }
+
+    .nav-shadow {
+      box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    *:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+  </style>
+</head>
+<body class="bg-bg font-inter text-dark antialiased">
+
+  <!-- ========== NAVBAR ========== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/40 transition-shadow duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2 text-dark font-bold text-lg">
+        <svg class="w-7 h-7 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        </svg>
+        <span>CloudSync</span>
+      </a>
+      <!-- Desktop Links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#features" class="text-sm font-medium text-slate-600 hover:text-dark transition-colors">Features</a>
+        <a href="#onboarding" class="text-sm font-medium text-slate-600 hover:text-dark transition-colors">Onboarding</a>
+        <a href="#calculator" class="text-sm font-medium text-slate-600 hover:text-dark transition-colors">Calculator</a>
+        <a href="#reviews" class="text-sm font-medium text-slate-600 hover:text-dark transition-colors">Reviews</a>
+        <a href="#faqs" class="text-sm font-medium text-slate-600 hover:text-dark transition-colors">FAQs</a>
+        <a href="#" class="inline-flex items-center px-5 py-2.5 rounded-full bg-dark text-white text-sm font-semibold hover:bg-slate-800 transition-colors">Book a Call</a>
+      </div>
+      <!-- Mobile Hamburger -->
+      <button id="menuToggle" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Ouvrir le menu">
+        <span class="block w-6 h-0.5 bg-dark transition-all duration-200" id="bar1"></span>
+        <span class="block w-6 h-0.5 bg-dark transition-all duration-200" id="bar2"></span>
+        <span class="block w-6 h-0.5 bg-dark transition-all duration-200" id="bar3"></span>
+      </button>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden border-t border-slate-100 bg-white/95 backdrop-blur-md">
+      <div class="flex flex-col px-6 py-4 gap-4">
+        <a href="#features" class="text-sm font-medium text-slate-600 hover:text-dark">Features</a>
+        <a href="#onboarding" class="text-sm font-medium text-slate-600 hover:text-dark">Onboarding</a>
+        <a href="#calculator" class="text-sm font-medium text-slate-600 hover:text-dark">Calculator</a>
+        <a href="#reviews" class="text-sm font-medium text-slate-600 hover:text-dark">Reviews</a>
+        <a href="#faqs" class="text-sm font-medium text-slate-600 hover:text-dark">FAQs</a>
+        <a href="#" class="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-dark text-white text-sm font-semibold">Book a Call</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+
+  <!-- ========== HERO ========== -->
+  <section class="hero-gradient relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <!-- Badge -->
+      <div id="heroBadge" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand text-xs font-semibold mb-6 uppercase tracking-wider">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Build for Your Enterprise
+      </div>
+      <!-- Title -->
+      <h1 id="heroTitle" class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-dark leading-tight max-w-4xl mx-auto">
+        Synchronisez vos fichiers<br class="hidden sm:block" /> en temps réel
+      </h1>
+      <!-- Subtitle -->
+      <p id="heroDesc" class="mt-6 text-lg sm:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+        Tout ce dont vous avez besoin pour gérer, synchroniser et collaborer sur vos documents — en un seul endroit.
+      </p>
+      <!-- CTAs -->
+      <div id="heroCTA" class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <a href="#" class="inline-flex items-center px-7 py-3.5 rounded-full bg-brand text-white font-semibold text-sm hover:bg-blue-700 transition-colors shadow-lg shadow-brand/20">
+          Démarrer gratuitement
+        </a>
+        <a href="#" class="inline-flex items-center px-7 py-3.5 rounded-full border-2 border-slate-200 text-dark font-semibold text-sm hover:border-slate-300 transition-colors">
+          Voir la démo
+        </a>
+      </div>
+
+      <!-- Mock Dashboard -->
+      <div id="heroVisual" class="mt-16 max-w-3xl mx-auto">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
+          <!-- Browser Chrome -->
+          <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-100 bg-slate-50">
+            <span class="w-3 h-3 rounded-full bg-red-400"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+            <span class="w-3 h-3 rounded-full bg-green-400"></span>
+            <span class="ml-3 text-xs text-slate-400 font-medium">CloudSync — Tableau de bord</span>
+          </div>
+          <!-- File Rows -->
+          <div class="divide-y divide-slate-100">
+            <!-- Row 1 -->
+            <div class="flex items-center justify-between px-5 py-4 hover:bg-slate-50/60 transition-colors">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-dark">Rapport_Q4_2025.docx</p>
+                  <p class="text-xs text-slate-400">Modifié il y a 2 min</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="flex -space-x-2">
+                  <div class="w-7 h-7 rounded-full bg-brand text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">AK</div>
+                  <div class="w-7 h-7 rounded-full bg-purple-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">FA</div>
+                  <div class="w-7 h-7 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">SM</div>
+                </div>
+              </div>
+            </div>
+            <!-- Row 2 -->
+            <div class="flex items-center justify-between px-5 py-4 hover:bg-slate-50/60 transition-colors">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-dark">Maquette_Dashboard.png</p>
+                  <p class="text-xs text-slate-400">Image</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+                Sync OK
+              </span>
+            </div>
+            <!-- Row 3 -->
+            <div class="flex items-center justify-between px-5 py-4 hover:bg-slate-50/60 transition-colors">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-dark">Budget_2026.xlsx</p>
+                  <p class="text-xs text-slate-400">Feuille de calcul</p>
+                </div>
+              </div>
+              <svg class="w-5 h-5 text-brand spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            </div>
+          </div>
+        </div>
+        <!-- Floating nodes -->
+        <div class="relative">
+          <div class="float-anim absolute -top-12 left-4 sm:left-12 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 border border-green-100 text-green-700 text-xs font-semibold shadow-sm">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+            Synchronisé
+          </div>
+          <div class="float-anim-delay absolute -top-8 right-4 sm:right-12 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand text-xs font-semibold shadow-sm">
+            +3 fichiers
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FEATURES ========== -->
+  <section id="features" class="py-20 lg:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand text-xs font-semibold uppercase tracking-wider mb-4">Features</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-dark max-w-3xl mx-auto leading-tight">
+          Transformez votre espace de travail en un hub collaboratif
+        </h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div class="feature-card">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-dark mb-2">Synchronisation temps réel</h3>
+          <p class="text-sm text-slate-500 leading-relaxed mb-4">
+            Vos fichiers sont synchronisés instantanément entre tous vos appareils et ceux de votre équipe. Modifications en direct, zéro conflit, zéro attente.
+          </p>
+          <a href="#" class="text-sm font-semibold text-brand hover:text-blue-700 transition-colors">En savoir plus →</a>
+        </div>
+        <!-- Card 2 -->
+        <div class="feature-card">
+          <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-dark mb-2">Checkouts personnalisés</h3>
+          <p class="text-sm text-slate-500 leading-relaxed mb-4">
+            Créez des flux de travail sur mesure pour chaque projet. Définissez les permissions, les étapes de validation et les notifications automatiques.
+          </p>
+          <a href="#" class="text-sm font-semibold text-brand hover:text-blue-700 transition-colors">En savoir plus →</a>
+        </div>
+        <!-- Card 3 -->
+        <div class="feature-card">
+          <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-dark mb-2">Analyse & Prévisions</h3>
+          <p class="text-sm text-slate-500 leading-relaxed mb-4">
+            Un tableau de bord analytique qui vous donne une vision claire de l'activité de votre équipe, avec des prévisions et des recommandations.
+          </p>
+          <a href="#" class="text-sm font-semibold text-brand hover:text-blue-700 transition-colors">En savoir plus →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== BENEFITS BENTO ========== -->
+  <section class="py-20 lg:py-28 bg-slate-50/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand text-xs font-semibold uppercase tracking-wider mb-4">Benefits</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-dark max-w-3xl mx-auto leading-tight">
+          Conçu pour vous aider à grossir
+        </h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Bento 1: 2-col span -->
+        <div class="bento-card md:col-span-2 row-span-1">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-dark">Revenus récurrents prévisibles</h3>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> En direct
+            </span>
+          </div>
+          <div class="flex items-end gap-2 mt-6">
+            <div class="flex flex-col items-center gap-1">
+              <div class="w-10 bg-brand/20 rounded-t" style="height:40px"></div>
+              <span class="text-[10px] text-slate-400">Jan</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="w-10 bg-brand/30 rounded-t" style="height:56px"></div>
+              <span class="text-[10px] text-slate-400">Fév</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="w-10 bg-brand/40 rounded-t" style="height:72px"></div>
+              <span class="text-[10px] text-slate-400">Mar</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="w-10 bg-brand/60 rounded-t" style="height:92px"></div>
+              <span class="text-[10px] text-slate-400">Avr</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="w-10 bg-brand rounded-t" style="height:112px"></div>
+              <span class="text-[10px] text-slate-400">Mai</span>
+            </div>
+          </div>
+        </div>
+        <!-- Bento 2 -->
+        <div class="bento-card">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-dark mb-1">Moins de tâches répétitives</h3>
+          <p class="text-sm text-slate-500">Automatisez les routines et concentrez-vous sur ce qui compte vraiment.</p>
+        </div>
+        <!-- Bento 3 -->
+        <div class="bento-card">
+          <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-dark mb-1">Moins d'échecs de paiement</h3>
+          <p class="text-sm text-slate-500">Gérez les renouvellements et les relances automatiquement.</p>
+        </div>
+        <!-- Bento 4 -->
+        <div class="bento-card">
+          <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-dark mb-1">Plus haute conversion</h3>
+          <p class="text-sm text-slate-500">Optimisez chaque étape du parcours utilisateur pour maximiser les conversions.</p>
+        </div>
+        <!-- Bento 5 -->
+        <div class="bento-card">
+          <div class="w-10 h-10 rounded-lg bg-rose-50 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-dark mb-1">Installation rapide</h3>
+          <p class="text-sm text-slate-500">En place en quelques minutes, sans intervention technique lourde.</p>
+        </div>
+        <!-- Bento 6: 2-col span -->
+        <div class="bento-card md:col-span-2">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+                <svg class="w-5 h-5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23,7 16,12 23,17 23,7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              </div>
+              <h3 class="text-base font-bold text-dark mb-1">Collaborez en direct sur vos fichiers</h3>
+              <p class="text-sm text-slate-500">Éditez, commentez et validez en équipe, en temps réel.</p>
+            </div>
+            <a href="#" class="inline-flex items-center px-5 py-2.5 rounded-full bg-brand text-white text-sm font-semibold hover:bg-blue-700 transition-colors whitespace-nowrap">
+              Book a call now
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== COMPARISON ========== -->
+  <section class="py-20 lg:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-dark leading-tight mb-6">
+            Pourquoi CloudSync bat la concurrence
+          </h2>
+          <p class="text-slate-500 leading-relaxed mb-8">
+            Les solutions existantes offrent des fonctionnalités basiques. CloudSync va plus loin avec une synchronisation native, une flexibilité de plan totale et un support dédié.
+          </p>
+          <a href="#" class="inline-flex items-center px-7 py-3.5 rounded-full bg-brand text-white font-semibold text-sm hover:bg-blue-700 transition-colors shadow-lg shadow-brand/20">
+            Commencer
+          </a>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="compare-table w-full text-sm">
+            <thead>
+              <tr>
+                <th class="rounded-tl-lg">Feature</th>
+                <th>Autres</th>
+                <th class="rounded-tr-lg text-brand">CloudSync</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-medium text-dark">Synchronisation temps réel</td>
+                <td class="text-slate-400">—</td>
+                <td class="text-green-600 font-semibold">✓</td>
+              </tr>
+              <tr>
+                <td class="font-medium text-dark">Plans flexibles</td>
+                <td class="text-slate-400">—</td>
+                <td class="text-green-600 font-semibold">✓</td>
+              </tr>
+              <tr>
+                <td class="font-medium text-dark">Récupération paiements</td>
+                <td class="text-slate-400">—</td>
+                <td class="text-green-600 font-semibold">✓</td>
+              </tr>
+              <tr>
+                <td class="font-medium text-dark">Gestion MID</td>
+                <td class="text-slate-400">—</td>
+                <td class="text-green-600 font-semibold">✓</td>
+              </tr>
+              <tr>
+                <td class="font-medium text-dark rounded-bl-lg">Multi-devises</td>
+                <td class="text-slate-400">—</td>
+                <td class="text-green-600 font-semibold rounded-br-lg">✓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ONBOARDING ========== -->
+  <section id="onboarding" class="py-20 lg:py-28 bg-slate-50/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand text-xs font-semibold uppercase tracking-wider mb-4">Onboarding</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-dark max-w-3xl mx-auto leading-tight">
+          Comment ça marche
+        </h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+        <!-- Connecting line (desktop) -->
+        <div class="hidden lg:block absolute top-16 left-[12.5%] right-[12.5%] h-0.5 bg-slate-200 z-0"></div>
+
+        <!-- Step 1 -->
+        <div class="relative z-10 text-center">
+          <div class="text-5xl font-black text-slate-100 mb-4">01</div>
+          <div class="step-card inline-block w-full">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </div>
+            <h3 class="text-base font-bold text-dark mb-1">Connectez votre entreprise</h3>
+            <p class="text-sm text-slate-500">Intégrez vos outils existants en quelques clics.</p>
+          </div>
+        </div>
+        <!-- Step 2 -->
+        <div class="relative z-10 text-center">
+          <div class="text-5xl font-black text-slate-100 mb-4">02</div>
+          <div class="step-card inline-block w-full">
+            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14l2 2 4-4"/></svg>
+            </div>
+            <h3 class="text-base font-bold text-dark mb-1">Définissez votre stratégie</h3>
+            <p class="text-sm text-slate-500">Configurez les flux de travail et les permissions.</p>
+          </div>
+        </div>
+        <!-- Step 3 -->
+        <div class="relative z-10 text-center">
+          <div class="text-5xl font-black text-slate-100 mb-4">03</div>
+          <div class="step-card inline-block w-full">
+            <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <h3 class="text-base font-bold text-dark mb-1">Convertissez les clics</h3>
+            <p class="text-sm text-slate-500">Transformez l'activité en revenus mesurables.</p>
+          </div>
+        </div>
+        <!-- Step 4 -->
+        <div class="relative z-10 text-center">
+          <div class="text-5xl font-black text-slate-100 mb-4">04</div>
+          <div class="step-card inline-block w-full">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <h3 class="text-base font-bold text-dark mb-1">Passez à l'échelle</h3>
+            <p class="text-sm text-slate-500">Déployez à toute l'entreprise sans friction.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CALCULATOR ========== -->
+  <section id="calculator" class="py-20 lg:py-28">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand text-xs font-semibold uppercase tracking-wider mb-4">ROI Calculator</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-dark max-w-2xl mx-auto leading-tight">
+          Calculez comment CloudSync peut transformer votre entreprise
+        </h2>
+      </div>
+      <div class="bg-slate-100/70 rounded-2xl p-6 sm:p-8 lg:p-10">
+        <div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          <!-- Sliders -->
+          <div class="space-y-8">
+            <!-- Users -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label for="usersSlider" class="text-sm font-semibold text-dark">Utilisateurs</label>
+                <span id="usersVal" class="text-sm font-bold text-brand">500</span>
+              </div>
+              <input type="range" id="usersSlider" min="10" max="5000" value="500" step="10" aria-label="Nombre d'utilisateurs" />
+            </div>
+            <!-- Budget -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label for="budgetSlider" class="text-sm font-semibold text-dark">Budget mensuel</label>
+                <span id="budgetVal" class="text-sm font-bold text-brand">5 000 EUR</span>
+              </div>
+              <input type="range" id="budgetSlider" min="100" max="50000" value="5000" step="100" aria-label="Coût mensuel" />
+            </div>
+            <!-- Hours -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label for="hoursSlider" class="text-sm font-semibold text-dark">Heures perdues / semaine</label>
+                <span id="hoursVal" class="text-sm font-bold text-brand">20 h</span>
+              </div>
+              <input type="range" id="hoursSlider" min="1" max="100" value="20" step="1" aria-label="Temps gagné" />
+            </div>
+          </div>
+          <!-- Results -->
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <h3 class="text-lg font-bold text-dark mb-6">Votre estimation</h3>
+            <div class="space-y-5">
+              <div>
+                <p class="text-sm text-slate-500 mb-1">Economies annuelles estimees</p>
+                <p id="resultSavings" class="text-2xl font-extrabold text-dark">15 000 EUR</p>
+              </div>
+              <div class="border-t border-slate-100 pt-5">
+                <p class="text-sm text-slate-500 mb-1">Heures gagnees par mois</p>
+                <p id="resultHours" class="text-2xl font-extrabold text-brand">64 h</p>
+              </div>
+              <div class="border-t border-slate-100 pt-5">
+                <p class="text-sm text-slate-500 mb-1">ROI apres 12 mois</p>
+                <p id="resultROI" class="text-2xl font-extrabold text-green-600">+329%</p>
+              </div>
+            </div>
+            <a href="#" class="mt-8 w-full inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-brand text-white font-semibold text-sm hover:bg-blue-700 transition-colors">
+              Obtenir mon estimation gratuite
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PRICING ========== -->
+  <section class="py-20 lg:py-28 bg-slate-50/50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand text-xs font-semibold uppercase tracking-wider mb-4">Pricing</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-dark max-w-2xl mx-auto leading-tight">
+          Tarification sans surprises
+        </h2>
+      </div>
+      <div class="max-w-md mx-auto">
+        <div class="pricing-card relative">
+          <span class="absolute -top-3.5 right-6 inline-flex items-center px-3 py-1 rounded-full bg-brand text-white text-xs font-bold uppercase tracking-wide">Populaire</span>
+          <p class="text-sm font-semibold text-slate-500 mb-1">Premium Plan</p>
+          <div class="flex items-baseline gap-1 mb-6">
+            <span class="text-4xl font-extrabold text-dark">3 500 EUR</span>
+            <span class="text-sm text-slate-400">/an</span>
+          </div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+              Stockage illimite
+            </li>
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+              Collaboration temps réel
+            </li>
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+              API & intégrations
+            </li>
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+              Support 24/7
+            </li>
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+              Analytics avancés
+            </li>
+          </ul>
+          <a href="#" class="w-full inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-brand text-white font-semibold text-sm hover:bg-blue-700 transition-colors">
+            Obtenir un devis
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== REVIEWS ========== -->
+  <section id="reviews" class="py-20 lg:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand text-xs font-semibold uppercase tracking-wider mb-4">Reviews</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-dark max-w-3xl mx-auto leading-tight">
+          Ce que nos clients disent
+        </h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card">
+          <div class="flex gap-1 mb-4">
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-6">
+            "CloudSync a révolutionné notre façon de collaborer. Nos équipes sont plus rapides, plus synchronisées et plus productives que jamais."
+          </p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-brand text-white text-sm font-bold flex items-center justify-center">AK</div>
+            <div>
+              <p class="text-sm font-semibold text-dark">Amadou Kora</p>
+              <p class="text-xs text-slate-400">Directeur Technique</p>
+            </div>
+          </div>
+        </div>
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card">
+          <div class="flex gap-1 mb-4">
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-6">
+            "L'intégration a été transparente. En une semaine, toute l'équipe était opérationnelle. Le support client est exceptionnel."
+          </p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-purple-500 text-white text-sm font-bold flex items-center justify-center">FA</div>
+            <div>
+              <p class="text-sm font-semibold text-dark">Fatou Abiola</p>
+              <p class="text-xs text-slate-400">CTO Startup</p>
+            </div>
+          </div>
+        </div>
+        <!-- Testimonial 3 -->
+        <div class="testimonial-card">
+          <div class="flex gap-1 mb-4">
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-6">
+            "Nous avons réduit nos coûts de 40% tout en améliorant la satisfaction de nos clients. CloudSync est devenu indispensable."
+          </p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-amber-500 text-white text-sm font-bold flex items-center justify-center">SM</div>
+            <div>
+              <p class="text-sm font-semibold text-dark">Segbena Moto</p>
+              <p class="text-xs text-slate-400">Chef de Projet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER CTA ========== -->
+  <section class="py-20 lg:py-28 bg-dark">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-4">
+        Unlock the Power of CloudSync
+      </h2>
+      <p class="text-lg text-slate-400 mb-10 max-w-xl mx-auto">
+        Rejoignez des centaines d'entreprises qui ont déjà transformé leur productivité avec CloudSync.
+      </p>
+      <a href="#" class="inline-flex items-center px-8 py-4 rounded-full bg-brand text-white font-semibold text-sm hover:bg-blue-700 transition-colors shadow-lg shadow-brand/30">
+        Book a Call
+      </a>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="bg-dark border-t border-white/10 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+        <!-- Logo -->
+        <div>
+          <a href="#" class="flex items-center gap-2 text-white font-bold text-lg mb-4">
+            <svg class="w-6 h-6 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+            <span>CloudSync</span>
+          </a>
+          <p class="text-sm text-slate-400 leading-relaxed">La synchronisation de fichiers nouvelle generation pour les entreprises.</p>
+        </div>
+        <!-- Navigation -->
+        <div>
+          <h4 class="text-sm font-semibold text-white mb-4">Navigation</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#features" class="text-sm text-slate-400 hover:text-white transition-colors">Features</a></li>
+            <li><a href="#onboarding" class="text-sm text-slate-400 hover:text-white transition-colors">Onboarding</a></li>
+            <li><a href="#calculator" class="text-sm text-slate-400 hover:text-white transition-colors">Calculator</a></li>
+            <li><a href="#reviews" class="text-sm text-slate-400 hover:text-white transition-colors">Reviews</a></li>
+          </ul>
+        </div>
+        <!-- Features -->
+        <div>
+          <h4 class="text-sm font-semibold text-white mb-4">Features</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Synchronisation</a></li>
+            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Checkouts</a></li>
+            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Analytics</a></li>
+            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">API</a></li>
+          </ul>
+        </div>
+        <!-- Contact -->
+        <div>
+          <h4 class="text-sm font-semibold text-white mb-4">Contact</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">contact@cloudsync.io</a></li>
+            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Support</a></li>
+            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Status</a></li>
+          </ul>
+          <div class="flex gap-3 mt-4">
+            <a href="#" aria-label="Twitter" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/></svg>
+            </a>
+            <a href="#" aria-label="LinkedIn" class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/20 transition-colors">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-white/10 pt-6 text-center">
+        <p class="text-xs text-slate-500">&copy; 2026 CloudSync. Tous droits reserves.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script>
+    (function() {
+      // ---- Mobile Menu Toggle ----
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const bar1 = document.getElementById('bar1');
+      const bar2 = document.getElementById('bar2');
+      const bar3 = document.getElementById('bar3');
+      let menuOpen = false;
+
+      menuToggle.addEventListener('click', function() {
+        menuOpen = !menuOpen;
+        mobileMenu.classList.toggle('hidden');
+        if (menuOpen) {
+          bar1.style.transform = 'rotate(45deg) translate(4px, 4px)';
+          bar2.style.opacity = '0';
+          bar3.style.transform = 'rotate(-45deg) translate(4px, -4px)';
+        } else {
+          bar1.style.transform = '';
+          bar2.style.opacity = '1';
+          bar3.style.transform = '';
+        }
+      });
+
+      // Close mobile menu on link click
+      mobileMenu.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() {
+          mobileMenu.classList.add('hidden');
+          menuOpen = false;
+          bar1.style.transform = '';
+          bar2.style.opacity = '1';
+          bar3.style.transform = '';
+        });
+      });
+
+      // ---- Navbar Shadow on Scroll ----
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 10) {
+          navbar.classList.add('nav-shadow');
+        } else {
+          navbar.classList.remove('nav-shadow');
+        }
+      });
+
+      // ---- Calculator ----
+      const usersSlider = document.getElementById('usersSlider');
+      const budgetSlider = document.getElementById('budgetSlider');
+      const hoursSlider = document.getElementById('hoursSlider');
+      const usersVal = document.getElementById('usersVal');
+      const budgetVal = document.getElementById('budgetVal');
+      const hoursVal = document.getElementById('hoursVal');
+      const resultSavings = document.getElementById('resultSavings');
+      const resultHours = document.getElementById('resultHours');
+      const resultROI = document.getElementById('resultROI');
+
+      function formatNum(n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      }
+
+      function updateCalc() {
+        var users = parseInt(usersSlider.value, 10);
+        var budget = parseInt(budgetSlider.value, 10);
+        var hours = parseInt(hoursSlider.value, 10);
+
+        usersVal.textContent = formatNum(users);
+        budgetVal.textContent = formatNum(budget) + ' EUR';
+        hoursVal.textContent = hours + ' h';
+
+        var savings = users * 2.5 * 12;
+        var hoursPerMonth = hours * 4 * 0.8;
+        var roi = ((savings - 3500) / 3500) * 100;
+
+        resultSavings.textContent = formatNum(Math.round(savings)) + ' EUR';
+        resultHours.textContent = formatNum(Math.round(hoursPerMonth)) + ' h';
+        resultROI.textContent = '+' + formatNum(Math.round(roi)) + '%';
+      }
+
+      usersSlider.addEventListener('input', updateCalc);
+      budgetSlider.addEventListener('input', updateCalc);
+      hoursSlider.addEventListener('input', updateCalc);
+      updateCalc();
+
+      // ---- GSAP Animations (skip if reduced motion) ----
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!prefersReducedMotion && typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero timeline
+        var heroTL = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.8 } });
+        heroTL
+          .from('#heroBadge', { opacity: 0, y: 20 })
+          .from('#heroTitle', { opacity: 0, y: 30 }, '-=0.5')
+          .from('#heroDesc', { opacity: 0, y: 30 }, '-=0.5')
+          .from('#heroCTA', { opacity: 0, y: 20 }, '-=0.4')
+          .from('#heroVisual', { opacity: 0, y: 40, scale: 0.96 }, '-=0.3');
+
+        // Section entrance helper
+        function animateSection(selector, staggerChildren) {
+          var targets = document.querySelectorAll(selector);
+          targets.forEach(function(el) {
+            gsap.from(el, {
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 85%',
+                toggleActions: 'play none none none'
+              },
+              opacity: 0,
+              y: 40,
+              duration: 0.8,
+              ease: 'power3.out',
+              stagger: staggerChildren || 0
+            });
+          });
+        }
+
+        // Features
+        gsap.from('#features .feature-card', {
+          scrollTrigger: { trigger: '#features', start: 'top 80%' },
+          opacity: 0, y: 50, duration: 0.7, stagger: 0.15, ease: 'power3.out'
+        });
+        gsap.from('#features h2, #features span', {
+          scrollTrigger: { trigger: '#features', start: 'top 85%' },
+          opacity: 0, y: 30, duration: 0.6, stagger: 0.1, ease: 'power3.out'
+        });
+
+        // Benefits bento
+        gsap.from('.bento-card', {
+          scrollTrigger: { trigger: '.bento-card', start: 'top 85%' },
+          opacity: 0, y: 40, duration: 0.7, stagger: 0.1, ease: 'power3.out'
+        });
+
+        // Comparison
+        gsap.from('.compare-table tr', {
+          scrollTrigger: { trigger: '.compare-table', start: 'top 85%' },
+          opacity: 0, x: 30, duration: 0.5, stagger: 0.08, ease: 'power3.out'
+        });
+
+        // Onboarding steps
+        gsap.from('#onboarding .step-card', {
+          scrollTrigger: { trigger: '#onboarding', start: 'top 80%' },
+          opacity: 0, y: 50, duration: 0.7, stagger: 0.15, ease: 'power3.out'
+        });
+
+        // Calculator
+        gsap.from('#calculator .bg-slate-100\\/70', {
+          scrollTrigger: { trigger: '#calculator', start: 'top 80%' },
+          opacity: 0, y: 40, duration: 0.8, ease: 'power3.out'
+        });
+
+        // Pricing
+        gsap.from('.pricing-card', {
+          scrollTrigger: { trigger: '.pricing-card', start: 'top 85%' },
+          opacity: 0, y: 40, scale: 0.96, duration: 0.8, ease: 'power3.out'
+        });
+
+        // Reviews
+        gsap.from('.testimonial-card', {
+          scrollTrigger: { trigger: '#reviews', start: 'top 80%' },
+          opacity: 0, y: 50, duration: 0.7, stagger: 0.15, ease: 'power3.out'
+        });
+
+        // Footer CTA
+        gsap.from('.bg-dark .max-w-4xl', {
+          scrollTrigger: { trigger: '.bg-dark', start: 'top 85%' },
+          opacity: 0, y: 40, duration: 0.8, ease: 'power3.out'
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

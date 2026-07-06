@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cypox.vercel.app/sitemap.xml
