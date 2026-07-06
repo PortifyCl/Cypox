@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback } from 'react'
 
-const RADSEA_USER = import.meta.env.VITE_RADSEA_USER || 'Cypox111'
-const RADSEA_PASS = import.meta.env.VITE_RADSEA_PASS || 'Cypox11@11'
+const RADSEA_USER = import.meta.env.VITE_RADSEA_USER
+const RADSEA_PASS = import.meta.env.VITE_RADSEA_PASS
 const STORAGE_KEY = 'radsea_auth'
 
 const AuthContext = createContext(null)

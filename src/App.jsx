@@ -70,8 +70,8 @@ export default function App() {
                   <Route path="agents" element={<RADSEAAgents />} />
                   <Route path="analytics" element={<RADSEAAnalytics />} />
                   <Route path="audit" element={<RADSEAAudit />} />
-                  <Route path="*" element={<RADSEANotFound />} />
                 </Route>
+                <Route path="/radsea/*" element={<RADSEANotFound />} />
               </Routes>
             </Suspense>
           </RADSEAAuthProvider>
