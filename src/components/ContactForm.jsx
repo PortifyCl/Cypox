@@ -52,8 +52,9 @@ export default function ContactForm({ contactType }) {
     return () => clearTimeout(timer)
   }, [cooldown])
 
+  // Reset form when contact type changes
   useEffect(() => {
-    setStep(0)
+    setStep(0) // eslint-disable-line react-hooks/set-state-in-effect
     setFormState({ service: '', budget: '', name: '', email: '', message: '' })
     setEmailTouched(false)
     setError(null)

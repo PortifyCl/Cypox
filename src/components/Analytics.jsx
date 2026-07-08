@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
-import { getConsent } from './CookieConsent'
+import { getConsent } from '../utils/consent'
 
 const GA_ID = import.meta.env.VITE_GA_ID
 
-function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments) }
+function gtag() {
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push(arguments)
+}
 
 export default function Analytics() {
   const location = useLocation()
@@ -29,7 +32,11 @@ export default function Analytics() {
     gtag('config', GA_ID, { send_page_view: false })
 
     return () => {
-      try { document.head.removeChild(script) } catch {}
+      try {
+        document.head.removeChild(script)
+      } catch {
+        /* script may already be removed */
+      }
     }
   }, [consented])
 

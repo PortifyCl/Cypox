@@ -74,7 +74,7 @@ function AuditCard({ icon: Icon, title, subtitle, placeholder, problems, salt })
   const handleAnalyze = useCallback(() => {
     if (!url.trim()) return
     setAnalyzing(true)
-    let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '')
+    const domain = url.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '')
 
     setTimeout(() => {
       const score = getDeterministicScore(domain, salt)

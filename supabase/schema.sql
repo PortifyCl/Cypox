@@ -33,19 +33,44 @@ CREATE TABLE IF NOT EXISTS agents (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Audits table
+CREATE TABLE IF NOT EXISTS audits (
+  id BIGSERIAL PRIMARY KEY,
+  url TEXT NOT NULL,
+  overall INT NOT NULL,
+  scores JSONB DEFAULT '{}'::jsonb,
+  details JSONB DEFAULT '{}'::jsonb,
+  prospect_id BIGINT REFERENCES prospects(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_prospects_statut ON prospects(statut);
 CREATE INDEX IF NOT EXISTS idx_prospects_secteur ON prospects(secteur);
 CREATE INDEX IF NOT EXISTS idx_prospects_ville ON prospects(ville);
 CREATE INDEX IF NOT EXISTS idx_prospects_score ON prospects(score DESC);
+CREATE INDEX IF NOT EXISTS idx_audits_url ON audits(url);
+CREATE INDEX IF NOT EXISTS idx_audits_prospect ON audits(prospect_id);
 
--- RLS policies (permissive for demo — tighten in production)
+-- RLS policies
 ALTER TABLE prospects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audits ENABLE ROW LEVEL SECURITY;
 
--- Allow anon read/write for demo (restrict in production)
-CREATE POLICY "Allow all for anon" ON prospects FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for anon" ON agents FOR ALL USING (true) WITH CHECK (true);
+-- Prospects: service_role only (admin panel)
+CREATE POLICY "Service role full access" ON prospects
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- Agents: service_role only
+CREATE POLICY "Service role full access" ON agents
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- Audits: service_role for writes, anon can read own audits
+CREATE POLICY "Service role full access" ON audits
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Anon read audits" ON audits
+  FOR SELECT USING (true);
 
 -- Seed agents
 INSERT INTO agents (id, nom, role, statut, traite, erreurs) VALUES

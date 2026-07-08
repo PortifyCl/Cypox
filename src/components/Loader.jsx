@@ -8,7 +8,7 @@ export default function Loader({ onComplete }) {
 
   useEffect(() => {
     let raf
-    let start = performance.now()
+    const start = performance.now()
     const duration = 2000
 
     const tick = (now) => {

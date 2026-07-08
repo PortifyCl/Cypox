@@ -1,73 +1,94 @@
 import { useState, useRef, useCallback } from 'react'
-import { ArrowRight, Search } from 'lucide-react'
+import { ArrowRight, Search, Shield, Zap, SearchCode, Eye, FileText, Settings } from 'lucide-react'
 import { usePageTransition } from '../hooks/usePageTransition'
 
-const problems = [
-  'Site non optimisé pour mobile (63% du trafic vient du mobile)',
-  'Temps de chargement supérieur à 3 secondes (40% des visiteurs partent)',
-  'Pas de formulaire de contact visible en moins de 3 clics',
-  'Aucun référencement local Google (les clients proches ne vous trouvent pas)',
-  'Images non compressées (ralentissent le site)',
-  'Pas de page dédiée par service proposé',
-  'Aucun appel à l\'action clair sur la page d\'accueil',
-]
-
-function getScore(domain) {
-  let sum = 0
-  for (let i = 0; i < domain.length; i++) sum += domain.charCodeAt(i)
-  return 35 + (sum % 41)
+const categoryIcons = {
+  seo: SearchCode,
+  security: Shield,
+  performance: Zap,
+  accessibility: Eye,
+  content: FileText,
+  technical: Settings,
 }
 
-function pickProblems(domain) {
-  let sum = 0
-  for (let i = 0; i < domain.length; i++) sum += domain.charCodeAt(i)
-  const shuffled = [...problems].sort((_, b) => ((sum + b) % 7) - 3)
-  return shuffled.slice(0, 4)
+const categoryLabels = {
+  seo: 'SEO',
+  security: 'Sécurité',
+  performance: 'Performance',
+  accessibility: 'Accessibilité',
+  content: 'Contenu',
+  technical: 'Technique',
 }
 
 function getScoreColor(score) {
-  if (score < 45) return { ring: 'text-red-500', bg: 'bg-red-50', label: 'Urgent' }
-  if (score < 60) return { ring: 'text-orange-500', bg: 'bg-orange-50', label: 'À améliorer' }
-  return { ring: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Peut mieux faire' }
+  if (score < 40) return { ring: 'text-red-500', bg: 'bg-red-50', label: 'Urgent' }
+  if (score < 70) return { ring: 'text-orange-500', bg: 'bg-orange-50', label: 'À améliorer' }
+  return { ring: 'text-green-500', bg: 'bg-green-50', label: 'Bon état' }
 }
 
-function getOpportunity(domain) {
-  let sum = 0
-  for (let i = 0; i < domain.length; i++) sum += domain.charCodeAt(i)
-  const visitors = 80 + (sum % 121)
-  const conv = 1.5 + ((sum * 7) % 31) / 10
-  const value = 500 + ((sum * 13) % 801)
-  const leads = Math.round(visitors * conv / 100)
-  const lost = Math.round(leads * value)
-  return { visitors, conv: conv.toFixed(1), leads, lost }
+function getGrade(score) {
+  if (score >= 90) return 'A'
+  if (score >= 75) return 'B'
+  if (score >= 60) return 'C'
+  if (score >= 40) return 'D'
+  return 'F'
 }
 
 export default function AuditInput() {
   const [url, setUrl] = useState('')
   const [result, setResult] = useState(null)
   const [analyzing, setAnalyzing] = useState(false)
+  const [error, setError] = useState(null)
   const resultRef = useRef(null)
   const transitionTo = usePageTransition()
 
-  const handleAnalyze = useCallback(() => {
-    if (!url.trim()) return
+  const handleAnalyze = useCallback(async () => {
+    const input = url.trim()
+    if (!input) return
+
     setAnalyzing(true)
+    setError(null)
+    setResult(null)
 
-    let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '')
+    let targetUrl = input
+    if (!targetUrl.startsWith('http')) {
+      targetUrl = 'https://' + targetUrl
+    }
 
-    setTimeout(() => {
-      const score = getScore(domain)
-      const color = getScoreColor(score)
-      const selectedProblems = pickProblems(domain)
-      const opp = getOpportunity(domain)
+    try {
+      new URL(targetUrl)
+    } catch {
+      setError('URL invalide. Veuillez entrer une adresse valide.')
+      setAnalyzing(false)
+      return
+    }
 
-      setResult({ domain, score, color, problems: selectedProblems, opp })
+    try {
+      const res = await fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: targetUrl }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Erreur lors de l\'analyse.')
+        setAnalyzing(false)
+        return
+      }
+
+      const domain = targetUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '')
+      setResult({ ...data, domain })
       setAnalyzing(false)
 
       setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 100)
-    }, 800)
+    } catch {
+      setError('Impossible de contacter le serveur. Réessayez plus tard.')
+      setAnalyzing(false)
+    }
   }, [url])
 
   const handleKeyDown = (e) => {
@@ -103,41 +124,82 @@ export default function AuditInput() {
         </button>
       </div>
 
+      {/* Error */}
+      {error && (
+        <div className="mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       {/* Result */}
       {result && (
         <div ref={resultRef} className="mt-6 p-6 rounded-2xl bg-cypox-surface border border-cypox-border animate-[fadeSlideUp_0.5s_ease-out]">
-          <p className="text-[10px] text-cypox-gray/60 mb-4 italic">Résultat indicatif — audit complet disponible sur demande.</p>
-          {/* Domain + Score */}
-          <div className="flex items-center gap-4 mb-5">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center ${result.color.bg}`}>
-              <span className={`text-2xl font-display font-bold ${result.color.ring}`}>{result.score}</span>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-4">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${getScoreColor(result.overall).bg}`}>
+                <span className={`text-2xl font-display font-bold ${getScoreColor(result.overall).ring}`}>{result.overall}</span>
+              </div>
+              <div>
+                <p className="font-bold text-cypox-black">{result.domain}</p>
+                <p className="text-xs text-cypox-gray">
+                  Grade {getGrade(result.overall)} — {getScoreColor(result.overall).label}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-cypox-black">{result.domain}</p>
-              <p className="text-xs text-cypox-gray">{result.color.label} — Score sur 100</p>
-            </div>
+            <span className="text-[10px] text-cypox-gray/60 italic hidden sm:block">
+              {new Date(result.analyzedAt).toLocaleDateString('fr-FR')}
+            </span>
           </div>
 
-          {/* Problems */}
-          <ul className="space-y-2 mb-5">
-            {result.problems.map((p, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-cypox-text-muted">
-                <span className="text-red-500 mt-0.5 shrink-0">✗</span>
-                {p}
-              </li>
-            ))}
-          </ul>
-
-          {/* Opportunity */}
-          <div className="p-4 rounded-xl bg-white border border-cypox-border mb-5">
-            <p className="text-sm text-cypox-gray mb-1">Opportunité estimée</p>
-            <p className="font-display font-bold text-cypox-black text-lg">
-              ~{result.opp.lost.toLocaleString('fr-FR')}€ de CA potentiel perdu chaque mois
-            </p>
-            <p className="text-xs text-cypox-gray mt-1">
-              {result.opp.visitors} visiteurs/mois × {result.opp.conv}% de conversion = {result.opp.leads} leads manqués
-            </p>
+          {/* Category scores */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
+            {Object.entries(result.scores).map(([key, value]) => {
+              const Icon = categoryIcons[key]
+              return (
+                <div key={key} className="bg-white rounded-xl p-3 border border-cypox-border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon size={14} className="text-cypox-gray" />
+                    <span className="text-[10px] font-medium text-cypox-gray uppercase tracking-wider">{categoryLabels[key]}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-lg font-display font-bold ${value >= 70 ? 'text-green-600' : value >= 40 ? 'text-orange-500' : 'text-red-500'}`}>{value}</span>
+                    <div className="flex-1 h-1.5 bg-cypox-border rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${value >= 70 ? 'bg-green-500' : value >= 40 ? 'bg-orange-400' : 'bg-red-500'}`}
+                        style={{ width: `${value}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
+
+          {/* Issues summary */}
+          {result.details && (
+            <div className="mb-5">
+              <p className="text-xs font-medium text-cypox-gray uppercase tracking-wider mb-3">Problèmes détectés</p>
+              <div className="space-y-2">
+                {Object.entries(result.details)
+                  .filter(([, v]) => v.issues && v.issues.length > 0)
+                  .slice(0, 3)
+                  .map(([key, v]) => (
+                    <div key={key} className="bg-white rounded-lg p-3 border border-cypox-border">
+                      <span className="text-xs font-medium text-cypox-gray">{categoryLabels[key]}</span>
+                      <ul className="mt-1 space-y-0.5">
+                        {v.issues.slice(0, 2).map((issue, i) => (
+                          <li key={i} className="text-xs text-red-600 flex items-start gap-1.5">
+                            <span className="mt-0.5 shrink-0">✗</span>
+                            {issue}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
 
           {/* CTA */}
           <button
