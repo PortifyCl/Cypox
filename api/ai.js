@@ -1,8 +1,47 @@
 import { authenticate } from './_shared.js'
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY
+const GEMINI_KEYS = [
+  process.env.GEMINI_API_KEY,
+  process.env.GEMINI_API_KEY_BACKUP_1,
+  process.env.GEMINI_API_KEY_BACKUP_2,
+  process.env.GEMINI_API_KEY_BACKUP_3,
+].filter(Boolean)
+
 const GEMINI_MODEL = 'gemini-2.0-flash'
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`
+const GEMINI_BASE = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`
+
+async function callGemini(prompt) {
+  const body = JSON.stringify({
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 2048,
+    },
+  })
+
+  for (let i = 0; i < GEMINI_KEYS.length; i++) {
+    const key = GEMINI_KEYS[i]
+    const res = await fetch(`${GEMINI_BASE}?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    })
+
+    if (res.ok) return res
+    const err = await res.text()
+    console.error(`[AI] Key ${i + 1} failed (${res.status}):`, err)
+
+    if (res.status === 429 || res.status === 403) continue
+    return res
+  }
+
+  return new Response(JSON.stringify({ error: 'All Gemini API keys exhausted' }), {
+    status: 502,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -31,19 +70,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid action: use email, analyze, or score' })
     }
 
-    const response = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
-        },
-      }),
-    })
+    const response = await callGemini(prompt)
 
     if (!response.ok) {
       const err = await response.text()
