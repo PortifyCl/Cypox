@@ -52,25 +52,19 @@ CREATE INDEX IF NOT EXISTS idx_prospects_score ON prospects(score DESC);
 CREATE INDEX IF NOT EXISTS idx_audits_url ON audits(url);
 CREATE INDEX IF NOT EXISTS idx_audits_prospect ON audits(prospect_id);
 
--- RLS policies
+-- RLS policies — service_role only (RADSEA access via /api/radsea/* endpoints)
 ALTER TABLE prospects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audits ENABLE ROW LEVEL SECURITY;
 
--- Prospects: service_role only (admin panel)
 CREATE POLICY "Service role full access" ON prospects
   FOR ALL USING (auth.role() = 'service_role');
 
--- Agents: service_role only
 CREATE POLICY "Service role full access" ON agents
   FOR ALL USING (auth.role() = 'service_role');
 
--- Audits: service_role for writes, anon can read own audits
 CREATE POLICY "Service role full access" ON audits
   FOR ALL USING (auth.role() = 'service_role');
-
-CREATE POLICY "Anon read audits" ON audits
-  FOR SELECT USING (true);
 
 -- Seed agents
 INSERT INTO agents (id, nom, role, statut, traite, erreurs) VALUES

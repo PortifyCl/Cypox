@@ -1,8 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.VITE_SUPABASE_URL
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+import { getServiceClient } from './_shared.js'
+import { verifyToken } from './auth.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,6 +9,15 @@ export default async function handler(req, res) {
   const { url, prospect_id } = req.body
   if (!url) {
     return res.status(400).json({ error: 'URL is required' })
+  }
+
+  const authHeader = req.headers.authorization
+  if (authHeader) {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader
+    const payload = verifyToken(token)
+    if (!payload || payload.exp * 1000 < Date.now()) {
+      return res.status(401).json({ error: 'Token invalide ou expiré' })
+    }
   }
 
   let targetUrl = url.trim()
@@ -53,6 +59,7 @@ export default async function handler(req, res) {
     result.url = targetUrl
     result.analyzedAt = new Date().toISOString()
 
+    const supabase = getServiceClient()
     const { data: saved, error: saveError } = await supabase
       .from('audits')
       .insert({

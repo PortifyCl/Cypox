@@ -1,110 +1,103 @@
-import { supabase } from './supabase'
+import { getToken } from '../utils/token'
+
+function authHeaders() {
+  const token = getToken()
+  return token
+    ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    : { 'Content-Type': 'application/json' }
+}
+
+async function apiFetch(url, options = {}) {
+  const res = await fetch(url, { ...options, headers: { ...authHeaders(), ...options.headers } })
+  if (res.status === 401) {
+    throw new Error('Session expirée. Reconnectez-vous.')
+  }
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'API error')
+  return data
+}
 
 // ── Prospects ──────────────────────────────────────────
 export async function fetchProspects() {
-  const { data, error } = await supabase
-    .from('prospects')
-    .select('*')
-    .order('score', { ascending: false })
-  if (error) throw error
-  return data
+  return apiFetch('/api/radsea/prospects')
 }
 
 export async function fetchProspect(id) {
-  const { data, error } = await supabase
-    .from('prospects')
-    .select('*')
-    .eq('id', id)
-    .single()
-  if (error) throw error
-  return data
+  const all = await apiFetch('/api/radsea/prospects')
+  const p = all.find((x) => String(x.id) === String(id))
+  if (!p) throw new Error('Prospect introuvable')
+  return p
 }
 
 export async function updateProspectStatut(id, statut) {
-  const { error } = await supabase
-    .from('prospects')
-    .update({ statut, updated_at: new Date().toISOString() })
-    .eq('id', id)
-  if (error) throw error
+  return apiFetch('/api/radsea/prospects', {
+    method: 'PATCH',
+    body: JSON.stringify({ id, statut }),
+  })
 }
 
 // ── Agents ─────────────────────────────────────────────
 export async function fetchAgents() {
-  const { data, error } = await supabase
-    .from('agents')
-    .select('*')
-    .order('id')
-  if (error) throw error
-  return data
+  return apiFetch('/api/radsea/agents')
 }
 
 // ── Stats (computed from prospects) ────────────────────
 export async function fetchStats() {
-  const { data: prospects, error } = await supabase
-    .from('prospects')
-    .select('statut, score, secteur, ville')
-  if (error) throw error
+  const prospects = await fetchProspects()
 
   const total = prospects.length
-  const convertis = prospects.filter(p => p.statut === 'Converti').length
+  if (total === 0) {
+    return {
+      totalProspects: 0,
+      analysesEnCours: 0,
+      propositionsEnvoyees: 0,
+      tauxConversion: '0%',
+      scoreMoyen: 0,
+      secteursCouverts: 0,
+      villesCouvertes: 0,
+    }
+  }
+
+  const convertis = prospects.filter((p) => p.statut === 'Converti').length
 
   return {
     totalProspects: total,
-    analysesEnCours: prospects.filter(p => p.statut === 'En analyse').length,
-    propositionsEnvoyees: prospects.filter(p =>
-      ['Proposition préparée', 'En attente validation', 'Contacté'].includes(p.statut)
+    analysesEnCours: prospects.filter((p) => p.statut === 'En analyse').length,
+    propositionsEnvoyees: prospects.filter((p) =>
+      ['Proposition préparée', 'En attente validation', 'Contacté'].includes(p.statut),
     ).length,
     tauxConversion: `${Math.round((convertis / total) * 100)}%`,
     scoreMoyen: Math.round(prospects.reduce((s, p) => s + p.score, 0) / total),
-    secteursCouverts: new Set(prospects.map(p => p.secteur)).size,
-    villesCouvertes: new Set(prospects.map(p => p.ville)).size,
+    secteursCouverts: new Set(prospects.map((p) => p.secteur)).size,
+    villesCouvertes: new Set(prospects.map((p) => p.ville)).size,
   }
 }
 
 // ── Audits ─────────────────────────────────────────────
 export async function fetchAudits(limit = 20) {
-  const { data, error } = await supabase
-    .from('audits')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(limit)
-  if (error) throw error
-  return data
+  return apiFetch(`/api/radsea/audits?limit=${limit}`)
 }
 
 export async function fetchAudit(id) {
-  const { data, error } = await supabase
-    .from('audits')
-    .select('*')
-    .eq('id', id)
-    .single()
-  if (error) throw error
-  return data
+  const all = await apiFetch('/api/radsea/audits?limit=100')
+  const a = all.find((x) => String(x.id) === String(id))
+  if (!a) throw new Error('Audit introuvable')
+  return a
 }
 
 export async function deleteAudit(id) {
-  const { error } = await supabase
-    .from('audits')
-    .delete()
-    .eq('id', id)
-  if (error) throw error
+  return apiFetch(`/api/radsea/audits?id=${id}`, { method: 'DELETE' })
 }
 
 export async function fetchAuditsByProspect(prospectId) {
-  const { data, error } = await supabase
-    .from('audits')
-    .select('*')
-    .eq('prospect_id', prospectId)
-    .order('created_at', { ascending: false })
-  if (error) throw error
-  return data
+  return apiFetch(`/api/radsea/audits?prospect_id=${prospectId}`)
 }
 
 // ── AI (Gemini via /api/ai) ────────────────────────────
 async function callAI(action, prospect, audit = null) {
   const res = await fetch('/api/ai', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ action, prospect, audit }),
   })
   const data = await res.json()

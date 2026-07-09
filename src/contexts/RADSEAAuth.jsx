@@ -1,8 +1,6 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { getToken, storeToken, removeToken, isAuthenticated as checkAuth } from '../utils/token'
 
-const RADSEA_USER = import.meta.env.VITE_RADSEA_USER
-const RADSEA_PASS = import.meta.env.VITE_RADSEA_PASS
-const STORAGE_KEY = 'radsea_auth'
 const ATTEMPTS_KEY = 'radsea_login_attempts'
 const LOCKOUT_KEY = 'radsea_lockout_until'
 
@@ -51,44 +49,59 @@ function clearAttempts() {
   try {
     sessionStorage.removeItem(ATTEMPTS_KEY)
     sessionStorage.removeItem(LOCKOUT_KEY)
-  } catch {}
+  } catch {
+    /* sessionStorage may be unavailable */
+  }
 }
 
 export function RADSEAAuthProvider({ children }) {
-  const [authenticated, setAuthenticated] = useState(() => {
-    try {
-      return sessionStorage.getItem(STORAGE_KEY) === '1'
-    } catch {
-      return false
-    }
-  })
+  const [authenticated, setAuthenticated] = useState(() => checkAuth())
 
-  const login = useCallback((user, pass) => {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!checkAuth()) setAuthenticated(false)
+    }, 60_000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const login = useCallback(async (user, pass) => {
     if (isLockedOut()) {
       return { ok: false, error: 'Trop de tentatives. Réessayez dans 5 minutes.' }
     }
 
-    if (user === RADSEA_USER && pass === RADSEA_PASS) {
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user, pass }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        const attempts = getAttempts() + 1
+        setAttempts(attempts)
+
+        if (attempts >= MAX_ATTEMPTS) {
+          setLockoutUntil(Date.now() + LOCKOUT_DURATION_MS)
+          return { ok: false, error: 'Compte temporairement verrouillé après 5 tentatives. Réessayez dans 5 minutes.' }
+        }
+
+        const remaining = MAX_ATTEMPTS - attempts
+        return { ok: false, error: `${data.error || 'Identifiants incorrects'}. ${remaining} tentative${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}.` }
+      }
+
       clearAttempts()
-      sessionStorage.setItem(STORAGE_KEY, '1')
+      storeToken(data.token)
       setAuthenticated(true)
       return { ok: true }
+    } catch {
+      return { ok: false, error: 'Erreur réseau. Réessayez.' }
     }
-
-    const attempts = getAttempts() + 1
-    setAttempts(attempts)
-
-    if (attempts >= MAX_ATTEMPTS) {
-      setLockoutUntil(Date.now() + LOCKOUT_DURATION_MS)
-      return { ok: false, error: 'Compte temporairement verrouillé après 5 tentatives. Réessayez dans 5 minutes.' }
-    }
-
-    const remaining = MAX_ATTEMPTS - attempts
-    return { ok: false, error: `Identifiants incorrects. ${remaining} tentative${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}.` }
   }, [])
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem(STORAGE_KEY)
+    removeToken()
     clearAttempts()
     setAuthenticated(false)
   }, [])

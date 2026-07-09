@@ -10,20 +10,18 @@ export default function RADSEALogin() {
   const { login } = useRADSEAAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    setTimeout(() => {
-      const result = login(user, pass)
-      if (result.ok) {
-        navigate('/radsea/dashboard')
-      } else {
-        setError(result.error)
-        setLoading(false)
-      }
-    }, 400)
+    const result = await login(user, pass)
+    if (result.ok) {
+      navigate('/radsea/dashboard')
+    } else {
+      setError(result.error)
+      setLoading(false)
+    }
   }
 
   return (
